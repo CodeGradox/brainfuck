@@ -4,14 +4,14 @@ use std::io::{Read, Error as IOError};
 use std::fs::File;
 
 fn read_file() -> Result<String, IOError> {
-	let mut file = try!(File::open("test.txt"));
+	let mut file = try!(File::open("tests/hello_world.txt"));
 	let mut buf = String::new();
 	try!(file.read_to_string(&mut buf));
 	Ok(buf)
 }
 
 fn main() {
-	let mut tape = [0u8; 20];
+	let mut tape = [0u8; 500];
 	let mut head: usize = 0;
 	let mut buf_pos: usize = 0;
 	let buf: Vec<char> = read_file()
