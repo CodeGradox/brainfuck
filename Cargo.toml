@@ -1,0 +1,6 @@
+[package]
+name = "brainfuck"
+version = "0.1.0"
+authors = ["Magnus Åsrud <magnusasrud92@gmail.com>"]
+
+[dependencies]
