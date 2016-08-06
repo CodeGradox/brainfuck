@@ -19,11 +19,14 @@ fn main() {
 
 	let buf: Vec<char> = match env::args().nth(1) {
 		Some(ref s) => {
-			read_file(s)
-				.expect("Error encoutered while opening file")
-				.chars()
-				.collect()
-			},
+			match read_file(s) {
+				Ok(f) => f.chars().collect(),
+				Err(e) => {
+					println!("{} {}", e, s);
+					return;
+				},
+			}
+		},
 		None => {
 			println!("No file given!");
 			return;
