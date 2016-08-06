@@ -1,23 +1,34 @@
-// #![feature(io)]
+#![feature(io)]
 
 use std::io::{Read, Error as IOError};
 use std::fs::File;
+use std::env;
 
-fn read_file() -> Result<String, IOError> {
-	let mut file = try!(File::open("tests/hello_world.txt"));
+fn read_file(file: &str) -> Result<String, IOError> {
+	let mut file = try!(File::open(file));
 	let mut buf = String::new();
 	try!(file.read_to_string(&mut buf));
 	Ok(buf)
 }
 
 fn main() {
-	let mut tape = [0u8; 500];
+	let mut tape = [0u8; 1000];
 	let mut head: usize = 0;
 	let mut buf_pos: usize = 0;
-	let buf: Vec<char> = read_file()
-		.expect("Could not open file")
-		.chars()
-		.collect();
+	let stdin = std::io::stdin();
+
+	let buf: Vec<char> = match env::args().nth(1) {
+		Some(ref s) => {
+			read_file(s)
+				.expect("Error encoutered while opening file")
+				.chars()
+				.collect()
+			},
+		None => {
+			println!("No file given!");
+			return;
+		},
+	};
 
 	while buf_pos != buf.len() {
 		match buf[buf_pos] {
@@ -26,13 +37,12 @@ fn main() {
 			'>' => head += 1,
 			'<' => head -= 1,
 			'.' => print!("{}", tape[head] as char),
-			// ',' => {
-			// 	let input = std::io::stdin();
-			// 	match input.lock().chars().nth(0) {
-			// 		Some(c) => { tape[head] = c.unwrap() as u8 },
-			// 		None => { println!("Could not read input."); },
-			// 	}
-			// },
+			',' => {
+				match stdin.lock().chars().next() {
+					Some(c) => tape[head] = c.unwrap_or('\0') as u8,
+					None => println!("Could not read input."),
+				}
+			},
 			'[' => {
 				if tape[head] == 0 {
 					let mut level = 0;
@@ -64,8 +74,5 @@ fn main() {
 			_ => { /* Ignore all other characters */ },
 		}
 		buf_pos += 1;
-		// println!("head: {} tape: {:?}", head, tape);
 	}
-
-	// println!("{:?}", tape);
 }
