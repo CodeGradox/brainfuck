@@ -17,21 +17,13 @@ fn main() {
 	let mut buf_pos: usize = 0;
 	let stdin = std::io::stdin();
 
-	let buf: Vec<char> = match env::args().nth(1) {
-		Some(ref s) => {
-			match read_file(s) {
-				Ok(f) => f.chars().collect(),
-				Err(e) => {
-					println!("{} {}", e, s);
-					return;
-				},
-			}
-		},
-		None => {
-			println!("No file given!");
-			return;
-		},
-	};
+	let buf: Vec<char> = env::args()
+		.nth(1)
+		.map(|s| read_file(&s)
+			.expect(&format!("\"{}\" not found", s))
+			.chars()
+			.collect())
+		.expect("No argument given");
 
 	while buf_pos != buf.len() {
 		match buf[buf_pos] {
@@ -41,10 +33,10 @@ fn main() {
 			'<' => head -= 1,
 			'.' => print!("{}", tape[head] as char),
 			',' => {
-				match stdin.lock().chars().next() {
-					Some(c) => tape[head] = c.unwrap_or('\0') as u8,
-					None => println!("Could not read input."),
-				}
+				stdin.lock()
+					.chars()
+					.next()
+					.map(|x| tape[head] = x.expect("Error reading input") as u8);
 			},
 			'[' => {
 				if tape[head] == 0 {
